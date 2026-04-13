@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>（2组）机器学习算法实习生 · 招聘看板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
+<script>var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);</script>
+<style>
+  :root {
+    --bg:          #FFFFFF;
+    --bg-subtle:   #F7F8FA;
+    --bg-hover:    #F0F1F3;
+    --surface:     #FFFFFF;
+    --border:      #E5E7EB;
+    --border-hi:   #D1D5DB;
+
+    --ink:         #1F2937;
+    --ink-soft:    #374151;
+    --ink-dim:     #6B7280;
+    --ink-faint:   #D1D5DB;
+
+    /* 强调色 */
+    --accent:      #2563EB;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+
+    /* 状态色 */
+    --green:       #16A34A;
+    --green-soft:  rgba(22, 163, 74, 0.08);
+    --yellow:      #CA8A04;
+    --yellow-soft: rgba(202, 138, 4, 0.08);
+    --red:         #DC2626;
+    --red-soft:    rgba(220, 38, 38, 0.06);
+    --gray:        #9CA3AF;
+    --gray-soft:   rgba(156, 163, 175, 0.08);
+    --purple:      #7C3AED;
+    --purple-soft: rgba(124, 58, 237, 0.08);
+  }
+
+  [data-theme="dark"] {
+    --bg:          #0F1117;
+    --bg-subtle:   #1A1D27;
+    --bg-hover:    #242832;
+    --surface:     #1A1D27;
+    --border:      #2D3242;
+    --border-hi:   #3D4356;
+    --ink:         #E5E7EB;
+    --ink-soft:    #C9CDD5;
+    --ink-dim:     #8B92A5;
+    --ink-faint:   #3D4356;
+    --accent:      #60A5FA;
+    --accent-soft: rgba(96, 165, 250, 0.12);
+    --green:       #4ADE80;
+    --green-soft:  rgba(74, 222, 128, 0.12);
+    --yellow:      #FACC15;
+    --yellow-soft: rgba(250, 204, 21, 0.12);
+    --red:         #F87171;
+    --red-soft:    rgba(248, 113, 113, 0.1);
+    --gray:        #6B7280;
+    --gray-soft:   rgba(107, 114, 128, 0.12);
+    --purple:      #A78BFA;
+    --purple-soft: rgba(167, 139, 250, 0.12);
+  }
+
+  [data-theme="dark"] body {
+    background: linear-gradient(180deg, #0A0C12 0%, var(--bg) 120px), var(--bg);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow-y: auto;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    font-size: 13px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      linear-gradient(180deg, #F8F9FA 0%, var(--bg) 120px),
+      var(--bg);
+  }
+
+  .dashboard {
+    max-width: 1320px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 28px 44px 28px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 24px;
+  }
+
+  /* ─── Header (个人主页风格) ─── */
+  .header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-left {}
+
+  .eyebrow {
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    padding-bottom: 4px;
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--ink-dim);
+    transition: border-color 0.2s;
+  }
+  .theme-toggle:hover { border-color: var(--ink-dim); }
+
+  /* ─── Time filter ─── */
+  .time-filters {
+    display: flex;
+    gap: 4px;
+    margin-right: 12px;
+    padding-right: 12px;
+    border-right: 1px solid var(--border);
+  }
+
+  .time-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'Inter', -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    color: var(--ink-dim);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .time-btn:hover { border-color: var(--ink-dim); color: var(--ink-soft); }
+
+  .time-btn.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .date-input {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-dim);
+    width: 195px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s;
+  }
+
+  .date-input:hover, .date-input:focus { border-color: var(--accent); outline: none; }
+
+  .date-input.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* flatpickr overrides */
+  .flatpickr-calendar { font-family: 'Inter', -apple-system, sans-serif !important; font-size: 12px !important; }
+
+  /* ─── Main layout ─── */
+  .main {
+    display: grid;
+    grid-template-columns: 264px 1fr 272px;
+    gap: 32px;
+    min-height: 0;
+  }
+
+  /* ─── Section label ─── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  section > .section-label {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .section-label .tail {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--ink-faint);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* ─── Card — no border, subtle surface ─── */
+  .card {
+    background: var(--bg-subtle);
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  /* ─── Metric hero: 个人主页风格，无边框 ─── */
+  .metric-hero {
+    background: var(--bg-subtle);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .metric-hero .tag {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .metric-hero .big-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -3px;
+    margin-bottom: 14px;
+  }
+
+  .metric-hero .big-num .sep {
+    font-size: 30px;
+    color: var(--ink-dim);
+    margin: 0 4px;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+
+  .metric-hero .big-num .gap {
+    font-size: 26px;
+    color: var(--red);
+    margin-left: 10px;
+    letter-spacing: -0.5px;
+    font-weight: 600;
+  }
+
+  .metric-hero .pct-line {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+
+  /* ─── Funnel steps ─── */
+  .funnel-steps {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .funnel-step {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .funnel-step:last-child { border-bottom: none; }
+
+  .funnel-step:hover { background: var(--bg-hover); }
+
+  .funnel-step-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+
+  .funnel-step-head .link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .funnel-rate {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+  }
+
+  .funnel-bar {
+    height: 6px;
+    background: var(--bg-hover);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .funnel-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+  }
+
+  .funnel-nums {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: -0.2px;
+  }
+
+  .funnel-nums .unit {
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-left: 1px;
+  }
+
+  .funnel-step.anomaly .funnel-rate { color: var(--red); }
+  .funnel-step.anomaly .funnel-bar-fill { background: var(--red); }
+
+  .warn-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--red);
+    background: var(--red-soft);
+    padding: 1px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+
+  /* ─── Summary prose: 个人主页风格，无边框 ─── */
+  .funnel-prose {
+    margin-top: 14px;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--ink-dim);
+  }
+
+  .funnel-prose strong { color: var(--ink-soft); font-weight: 500; }
+  .funnel-prose .n     { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--accent); }
+  .funnel-prose .warn  { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--red); }
+
+  /* ─── Compare section ─── */
+  .compare-section { margin-top: 20px; }
+
+  .name-lists { margin-top: 12px; }
+  .name-list-row { margin-bottom: 8px; font-size: 11px; line-height: 1.8; }
+  .name-list-section {
+    display: inline-block;
+    color: var(--ink-dim);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .name-tag {
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+    padding: 1px 7px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    white-space: nowrap;
+    vertical-align: middle;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  /* 一面: blue */
+  .name-tag.stage-i1 {
+    border-color: rgba(37, 99, 235, 0.25);
+    color: #2563EB;
+    background: var(--accent-soft);
+  }
+  a.name-tag.stage-i1:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  /* 二面: purple */
+  .name-tag.stage-i2 {
+    border-color: rgba(124, 58, 237, 0.25);
+    color: #7C3AED;
+    background: var(--purple-soft);
+  }
+  a.name-tag.stage-i2:hover {
+    background: var(--purple-soft);
+    color: var(--purple);
+    border-color: var(--purple);
+  }
+  /* fallback hover */
+  a.name-tag:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .compare-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .compare-row:last-child { border-bottom: none; }
+
+  .compare-row .label { color: var(--ink-dim); }
+
+  .compare-row .bars {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .compare-bar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .compare-bar-track {
+    width: 52px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .compare-bar-track .fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .compare-bar-track .fill.current { background: var(--accent); }
+  .compare-bar-track .fill.base     { background: var(--border-hi); }
+
+  .compare-bar .pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    width: 30px;
+    text-align: right;
+  }
+
+  .compare-bar.warn .pct { color: var(--red); }
+  .compare-bar.warn .fill.current { background: var(--red); }
+
+  .compare-row .delta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-dim);
+    min-width: 44px;
+    text-align: right;
+  }
+
+  .compare-row.anomaly .label { color: var(--ink-soft); }
+  .compare-row.anomaly .delta { color: var(--red); }
+
+  /* ─── Candidate list: 个人主页风格，极简无边框 ─── */
+  .candidate-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .candidate-card {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  .candidate-card:last-child { border-bottom: none; }
+  .candidate-card:hover { background: var(--bg-hover); border-radius: 4px; }
+
+  .candidate-card.status-accept  { opacity: 1; }
+  .candidate-card.status-pending { opacity: 1; }
+  .candidate-card.status-reject  { opacity: 0.55; }
+  .candidate-card.status-decline { opacity: 0.55; }
+
+  /* 圆形头像 */
+  .candidate-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .status-accept  .candidate-avatar { border-color: var(--green); color: var(--green); }
+  .status-pending .candidate-avatar { border-color: var(--yellow); color: var(--yellow); }
+  .status-reject  .candidate-avatar { border-color: var(--gray); color: var(--gray); }
+  .status-decline .candidate-avatar { border-color: var(--red); color: var(--red); }
+
+  .candidate-avatar-inner {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .status-accept  .candidate-avatar-inner { background: var(--green-soft);  color: var(--green); }
+  .status-pending .candidate-avatar-inner { background: var(--yellow-soft); color: var(--yellow); }
+  .status-reject  .candidate-avatar-inner { background: var(--gray-soft);   color: var(--gray); }
+  .status-decline .candidate-avatar-inner { background: var(--red-soft);    color: var(--red); }
+
+  .candidate-body { flex: 1; min-width: 0; }
+
+  .candidate-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 1px;
+  }
+
+  .status-reject .candidate-name,
+  .status-decline .candidate-name { color: var(--ink-dim); text-decoration: line-through; }
+
+  .candidate-meta {
+    font-size: 10px;
+    color: var(--ink-dim);
+    letter-spacing: 0.2px;
+  }
+
+  /* 状态徽章 — 个人主页风格，小字细边框 */
+  .candidate-badge {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink-dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .status-accept  .candidate-badge { color: var(--green); }
+  .status-pending .candidate-badge { color: var(--yellow); }
+  .status-reject  .candidate-badge { color: var(--ink-dim); }
+  .status-decline .candidate-badge { color: var(--red); }
+
+  /* ─── Action items: 无边框无背景 ─── */
+  .action-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .action-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-dim);
+  }
+
+  .action-item:last-child { border-bottom: none; }
+
+  .action-item.warn { color: var(--ink-soft); }
+
+  .action-item .bullet {
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .action-item.warn .bullet { color: var(--red); }
+  .action-item:not(.warn) .bullet { color: var(--accent); }
+
+  .action-item strong { color: var(--ink-soft); font-weight: 500; }
+
+  /* ─── Links ─── */
+  a.link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  a.link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ─── Entrance ─── */
+  .fade-in {
+    animation: fadeIn 0.5s ease-out backwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  ::-webkit-scrollbar { display: none; }
+  * { scrollbar-width: none; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="data.js"></script>
+<script>
+(function() {
+  var D = DASHBOARD_DATA;
+  var L = D.links;
+  var TN = D.talentNames;
+  var apps = D.apps; // [id, talent_id, create_time, active_status, term_type, current_stage_idx, [reached_stages], hr_enter_time]
+  var currentLabel = '所有时间';
+  var periodLabels = { all: '所有时间', quarter: '本季度', month: '本月', week: '本周' };
+  var picker = null;
+  var calendarDates = D.dateRange; // tracks current flatpickr display dates
+
+  // Stage index constants
+  var S_ASSESS = 1, S_INVITE = 2, S_I1 = 3, S_I2 = 4, S_HR = 5, S_OFFER = 6, S_PENDING = 7, S_ONBOARD = 8;
+
+  // HR status mapping by current_stage_idx for active apps
+  var HR_STATUS = {};
+  HR_STATUS[S_ONBOARD] = ['accept', '已入职', '已入职'];
+  HR_STATUS[S_PENDING] = ['accept', '待入职', '待入职'];
+  HR_STATUS[S_OFFER]   = ['pending', 'Offer沟通', 'Offer沟通中'];
+
+  function link(href, text) {
+    return '<a class="link" href="' + href + '" target="_blank">' + text + '</a>';
+  }
+
+  function r(n, d) { return d > 0 ? Math.round(n / d * 100) : 0; }
+
+  /* ── Core: compute funnel from raw app data ── */
+  function computeFunnel(startMs, endMs) {
+    var stageReached = {}, stageTerminated = {}, stageActive = {};
+    var filtered = [];
+
+    for (var i = 0; i < apps.length; i++) {
+      var a = apps[i];
+      var ct = a[2]; // create_time
+      if (startMs && ct < startMs) continue;
+      if (endMs && ct > endMs) continue;
+      filtered.push(a);
+
+      var reached = a[6]; // [stage indices]
+      var activeStatus = a[3];
+      var curIdx = a[5];
+
+      for (var j = 0; j < reached.length; j++) {
+        stageReached[reached[j]] = (stageReached[reached[j]] || 0) + 1;
+      }
+      if (activeStatus === 2) {
+        stageTerminated[curIdx] = (stageTerminated[curIdx] || 0) + 1;
+      } else if (activeStatus === 1) {
+        stageActive[curIdx] = (stageActive[curIdx] || 0) + 1;
+      }
+    }
+
+    var total = filtered.length;
+    var assessPassed = stageReached[S_ASSESS] || 0;
+    var wtPassed = stageReached[S_INVITE] || 0;
+    var i1Total = stageReached[S_I1] || 0;
+    var i1Passed = stageReached[S_I2] || 0;
+    var i2Total = stageReached[S_I2] || 0;
+    var i2Passed = stageReached[S_HR] || 0;
+
+    // Build candidate lists
+    var i1Cands = [], i2Cands = [], hrCands = [];
+    for (var i = 0; i < filtered.length; i++) {
+      var a = filtered[i];
+      var appId = a[0], tid = a[1], reached = a[6], activeStatus = a[3], termType = a[4], curIdx = a[5], hrEnter = a[7];
+      var name = TN[tid];
+      if (!name) continue;
+
+      if (reached.indexOf(S_I1) >= 0) {
+        i1Cands.push({ name: name, talent_id: tid, application_id: appId });
+      }
+      if (reached.indexOf(S_I2) >= 0) {
+        i2Cands.push({ name: name, talent_id: tid, application_id: appId });
+      }
+      if (reached.indexOf(S_HR) >= 0) {
+        var st, role, label, nextAction = '';
+        if (activeStatus === 1 && HR_STATUS[curIdx]) {
+          st = HR_STATUS[curIdx][0]; role = HR_STATUS[curIdx][1]; label = HR_STATUS[curIdx][2];
+          if (curIdx === S_OFFER) nextAction = '确认 Offer 接受意向';
+        } else if (activeStatus === 1) {
+          st = 'pending'; role = 'HR面进行中'; label = '进行中';
+        } else if (termType === 22) {
+          st = 'decline'; role = '候选人放弃'; label = '候选人放弃';
+        } else if (termType === 1) {
+          st = 'reject'; role = 'HR面淘汰'; label = '已淘汰';
+        } else {
+          st = 'decline'; role = '已终止'; label = '已终止';
+        }
+        var dateStr = hrEnter ? new Date(hrEnter).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '';
+        hrCands.push({ name: name, talent_id: tid, application_id: appId, status: st, role: role, date: dateStr, label: label, nextAction: nextAction });
+      }
+    }
+
+    var statusOrder = { accept: 0, pending: 1, reject: 2, decline: 3 };
+    hrCands.sort(function(a, b) { return (statusOrder[a.status] || 9) - (statusOrder[b.status] || 9); });
+
+    D.entry = { resumesSent: total, assessPassed: assessPassed, assessRate: r(assessPassed, total) };
+    D.writtenTest = { collected: assessPassed, passed: wtPassed };
+    D.interview1 = {
+      current: { total: i1Total, passed: i1Passed, pending: stageActive[S_I1] || 0, rate: r(i1Passed, i1Total) },
+      bimonth: { total: i1Total, passed: i1Passed, rate: r(i1Passed, i1Total) },
+      candidates: i1Cands, candidates12m: []
+    };
+    D.interview2 = {
+      current: { total: i2Total, passed: i2Passed, pending: stageActive[S_I2] || 0, rate: r(i2Passed, i2Total) },
+      bimonth: { total: i2Total, passed: i2Passed, rate: r(i2Passed, i2Total) },
+      candidates: i2Cands, candidates12m: []
+    };
+    D.hrInterview = { total: hrCands.length, candidates: hrCands };
+  }
+
+  /* ── Period date range helpers ── */
+  function periodRange(key) {
+    var now = new Date();
+    if (key === 'all') return [0, 0];
+    if (key === 'quarter') {
+      var qm = Math.floor(now.getMonth() / 3) * 3;
+      return [+new Date(now.getFullYear(), qm, 1), 0];
+    }
+    if (key === 'month') return [+new Date(now.getFullYear(), now.getMonth(), 1), 0];
+    if (key === 'week') {
+      var d = new Date(now); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); d.setHours(0,0,0,0);
+      return [+d, 0];
+    }
+    return [0, 0];
+  }
+
+  function switchPeriod(key) {
+    currentLabel = periodLabels[key];
+    var range = periodRange(key);
+    computeFunnel(range[0], range[1]);
+    render();
+    // Sync button highlight
+    document.querySelectorAll('.time-btn').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-period') === key);
+    });
+    // Sync calendar display
+    if (key === 'all') {
+      calendarDates = D.dateRange;
+    } else {
+      var start = new Date(range[0]);
+      var fmt = function(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+      calendarDates = [fmt(start), fmt(new Date())];
+    }
+    if (picker) {
+      picker.setDate(calendarDates, false);
+    }
+    var el = document.getElementById('date-range');
+    if (el) el.classList.remove('active');
+  }
+  window.switchPeriod = switchPeriod;
+
+  function onDateRangeChange(dates) {
+    if (dates.length < 2) return;
+    var startMs = +new Date(dates[0].getFullYear(), dates[0].getMonth(), dates[0].getDate());
+    var endMs = +new Date(dates[1].getFullYear(), dates[1].getMonth(), dates[1].getDate(), 23, 59, 59, 999);
+    var fmt = function(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+    calendarDates = [fmt(dates[0]), fmt(dates[1])];
+    currentLabel = fmt(dates[0]) + ' \u2013 ' + fmt(dates[1]);
+    computeFunnel(startMs, endMs);
+    render();
+    // Deactivate preset buttons, highlight date input
+    document.querySelectorAll('.time-btn').forEach(function(b) { b.classList.remove('active'); });
+    var el = document.getElementById('date-range');
+    if (el) el.classList.add('active');
+  }
+
+  /* ── Render ── */
+  function render() {
+  var i1 = D.interview1;
+  var i2 = D.interview2;
+  var i1Anomaly = i1.current.rate < i1.bimonth.rate * 0.6;
+  var i2Anomaly = i2.current.rate < i2.bimonth.rate * 0.6;
+
+  var pct = Math.round(D.target.current / D.target.goal * 100);
+
+  var stages = [
+    { name: '简历筛选 · 评估', entered: D.entry.resumesSent, passed: D.entry.assessPassed, rate: D.entry.assessRate, link: L.hireReport, unit: '份', anomaly: false },
+    { name: '初面邀约', entered: D.writtenTest.collected, passed: D.writtenTest.passed, rate: D.writtenTest.collected > 0 ? Math.round(D.writtenTest.passed / D.writtenTest.collected * 100) : 0, link: L.writtenTestPipeline || L.wiki, unit: '人', anomaly: false },
+    { name: '专业一面', entered: i1.current.total, passed: i1.current.passed, rate: i1.current.rate, link: L.interview1_3m, unit: '人', anomaly: i1Anomaly },
+    { name: '专业二面', entered: i2.current.total, passed: i2.current.passed, rate: i2.current.rate, link: L.interview2_detail, unit: '人', anomaly: i2Anomaly }
+  ];
+
+  var funnelRowsHTML = stages.map(function(s) {
+    return '<div class="funnel-step' + (s.anomaly ? ' anomaly' : '') + '">' +
+      '<div class="funnel-step-head">' + link(s.link, s.name) + '<span class="funnel-rate">' + s.rate + '%' + (s.anomaly ? '<span class="warn-tag">⚠ 异常</span>' : '') + '</span></div>' +
+      '<div class="funnel-bar"><div class="funnel-bar-fill" style="width:' + Math.min(s.rate || 0, 100) + '%"></div></div>' +
+      '<div class="funnel-nums">' + s.entered + ' → ' + s.passed + '<span class="unit">' + s.unit + '</span></div>' +
+    '</div>';
+  }).join('');
+
+  var alertHTML = i2Anomaly
+    ? '<div class="funnel-prose">⚠ 二面通过率 <span class="warn">' + i2.current.rate + '%</span> 低于基线 <strong>' + i2.bimonth.rate + '%</strong>，关注 pending <strong>' + i2.current.pending + '</strong> 人。</div>'
+    : '';
+
+  function candidateList(cands, sectionLabel, stageClass) {
+    if (!cands || !cands.length) return '';
+    var cls = stageClass ? ' ' + stageClass : '';
+    return '<div class="name-list-row"><span class="name-list-section">' + sectionLabel + '</span> ' +
+      cands.map(function(c) {
+        var href = c.talent_id && c.application_id
+          ? 'https://deepwisdom.feishu.cn/atsx/talent/' + c.talent_id + '?application_id=' + c.application_id
+          : c.talent_id ? 'https://deepwisdom.feishu.cn/hire/talent/' + c.talent_id : '#';
+        return '<a class="link name-tag' + cls + '" href="' + href + '" target="_blank">' + (c.name || c.talent_id) + '</a>';
+      }).join(' ') + '</div>';
+  }
+
+  var namesHTML =
+    candidateList(i1.candidates, '专业一面', 'stage-i1') +
+    candidateList(i2.candidates, '专业二面', 'stage-i2');
+
+  var i1Delta = i1.current.rate - i1.bimonth.rate;
+  var i2Delta = i2.current.rate - i2.bimonth.rate;
+  var maxRate = Math.max(i1.current.rate, i1.bimonth.rate, i2.current.rate, i2.bimonth.rate, 1);
+  function bar(w) { return Math.round(w / maxRate * 100); }
+  var fmtDelta = function(d) { return (d >= 0 ? '+' : '') + d + 'pt'; };
+
+  var compareHTML =
+    '<div class="compare-section">' +
+      '<div class="section-label">面试通过率 <span class="tail">pass rate</span></div>' +
+      '<div class="compare-row' + (i1Anomaly ? ' anomaly' : '') + '">' +
+        '<span class="label">专业一面通过率</span>' +
+        '<div class="bars"><div class="compare-bar' + (i1Anomaly ? ' warn' : '') + '"><div class="compare-bar-track"><div class="fill current" style="width:' + bar(i1.current.rate) + '%"></div></div><span class="pct">' + link(L.interview1_3m, i1.current.rate + '%') + '</span></div>' +
+          '<div class="compare-bar"><div class="compare-bar-track"><div class="fill base" style="width:' + bar(i1.bimonth.rate) + '%"></div></div><span class="pct" style="color:var(--ink-dim)">' + link(L.interview1_12m, i1.bimonth.rate + '%') + '</span></div>' +
+          '<span class="delta">' + fmtDelta(i1Delta) + '</span></div></div>' +
+      '<div class="compare-row' + (i2Anomaly ? ' anomaly' : '') + '">' +
+        '<span class="label">专业二面通过率</span>' +
+        '<div class="bars"><div class="compare-bar' + (i2Anomaly ? ' warn' : '') + '"><div class="compare-bar-track"><div class="fill current" style="width:' + bar(i2.current.rate) + '%"></div></div><span class="pct">' + link(L.interview2_detail, i2.current.rate + '%') + '</span></div>' +
+          '<div class="compare-bar"><div class="compare-bar-track"><div class="fill base" style="width:' + bar(i2.bimonth.rate) + '%"></div></div><span class="pct" style="color:var(--ink-dim)">' + link(L.interview2_12m, i2.bimonth.rate + '%') + '</span></div>' +
+          '<span class="delta">' + fmtDelta(i2Delta) + (i2Anomaly ? ' ⚠' : '') + '</span></div></div>' +
+    '</div>';
+
+  function candidateLink(c) {
+    if (c.talent_id && c.application_id) return link('https://deepwisdom.feishu.cn/atsx/talent/' + c.talent_id + '?application_id=' + c.application_id, c.name);
+    if (c.talent_id) return link('https://deepwisdom.feishu.cn/hire/talent/' + c.talent_id, c.name);
+    return link(L.wiki, c.name);
+  }
+
+  var candidatesHTML = D.hrInterview.candidates.map(function(c) {
+    var meta = [c.role, c.date].filter(Boolean).join(' · ');
+    return '<li class="candidate-card status-' + c.status + '">' +
+      '<div class="candidate-avatar-inner">' + c.name.charAt(0) + '</div>' +
+      '<div class="candidate-body"><div class="candidate-name">' + candidateLink(c) + '</div>' +
+        (meta ? '<div class="candidate-meta">' + meta + '</div>' : '') +
+      '</div><span class="candidate-badge">' + c.label + '</span></li>';
+  }).join('');
+
+  var actions = [];
+  D.hrInterview.candidates.forEach(function(c) {
+    if (c.status === 'pending' && c.nextAction) actions.push({ warn: false, text: '跟进 <strong>' + c.name + '</strong> · ' + c.nextAction });
+  });
+  if (i2Anomaly) actions.push({ warn: true, text: '二面通过率 <strong>' + i2.current.rate + '%</strong> 异常，关注 pending <strong>' + i2.current.pending + '</strong> 人' });
+
+  var actionItemsHTML = '<ul class="action-list">' +
+    (actions.length === 0
+      ? '<li class="action-item" style="color:var(--ink-dim);font-style:italic">暂无待办</li>'
+      : actions.map(function(a) { return '<li class="action-item' + (a.warn ? ' warn' : '') + '"><span class="bullet">' + (a.warn ? '!' : '→') + '</span><span>' + a.text + '</span></li>'; }).join('')) +
+    '</ul>';
+
+  document.getElementById('app').innerHTML = '' +
+    '<div class="dashboard">' +
+    '<header class="header fade-in">' +
+      '<div class="header-left">' +
+        '<div class="eyebrow">算法2组 · 实习招聘</div>' +
+        '<h1>机器学习 <em>算法实习生</em> 招聘看板</h1>' +
+      '</div>' +
+      '<div class="header-right">' +
+        '<div class="time-filters">' +
+          ['all','quarter','month','week'].map(function(k) {
+            return '<button class="time-btn' + (currentLabel === periodLabels[k] ? ' active' : '') + '" data-period="' + k + '" onclick="switchPeriod(\'' + k + '\')">' + periodLabels[k] + '</button>';
+          }).join('') +
+          '<input id="date-range" class="date-input" placeholder="选择日期范围" readonly>' +
+        '</div>' +
+        '<span class="live-badge"><span class="live-dot"></span>更新 ' + D.updateTime + '</span>' +
+        '<button id="theme-toggle" class="theme-toggle"></button>' +
+      '</div>' +
+    '</header>' +
+    '<main class="main">' +
+      '<aside class="fade-in" style="animation-delay:0.06s;display:flex;flex-direction:column;gap:16px">' +
+        '<div class="section-label">招聘目标 <span class="tail">objective</span></div>' +
+        '<div class="metric-hero"><div class="tag">HC GAP</div>' +
+          '<div class="big-num"><span>' + D.target.current + '</span><span class="sep">/</span><span>' + D.target.goal + '</span><span class="gap">−' + D.target.gap + '</span></div>' +
+          '<div class="pct-line">' + D.target.current + ' / ' + D.target.goal + ' 在岗 · ' + pct + '%</div>' +
+          '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>' +
+        '<div class="card" style="font-size:13px;line-height:1.7;color:var(--ink-soft)">目标：<strong style="color:var(--ink)">ML算法实习生</strong> 不少于 <strong style="color:var(--accent)">' + D.target.goal + '</strong> 人，已入职 <strong style="color:var(--ink)">' + D.target.current + '</strong> 人，还需 <strong style="color:var(--red)">' + D.target.gap + '</strong> 人。</div>' +
+      '</aside>' +
+      '<section class="fade-in" style="animation-delay:0.1s;display:flex;flex-direction:column;gap:0">' +
+        '<div class="section-label">招聘漏斗 <span class="tail">funnel · ' + currentLabel + '</span></div>' +
+        '<div class="card" style="padding:0;overflow:hidden"><div class="funnel-steps">' + funnelRowsHTML + '</div></div>' +
+        (namesHTML ? '<div class="name-lists">' + namesHTML + '</div>' : '') +
+        compareHTML + alertHTML +
+      '</section>' +
+      '<aside class="fade-in" style="animation-delay:0.14s;display:flex;flex-direction:column;gap:0">' +
+        '<div class="section-label">HR 面 · 出口 <span class="tail">' + D.hrInterview.total + ' 人</span></div>' +
+        '<ul class="candidate-list">' + candidatesHTML + '</ul>' +
+        '<div class="section-label" style="margin-top:16px">待办 <span class="tail">action items</span></div>' +
+        actionItemsHTML +
+      '</aside>' +
+    '</main></div>';
+
+  // Theme toggle
+  var btn = document.getElementById('theme-toggle');
+  function updateThemeBtn() {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+  }
+  btn.addEventListener('click', function() {
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeBtn();
+  });
+  updateThemeBtn();
+
+  // Init flatpickr on date input
+  picker = flatpickr('#date-range', {
+    mode: 'range',
+    locale: 'zh',
+    dateFormat: 'Y-m-d',
+    defaultDate: calendarDates,
+    onChange: function(dates) { if (dates.length === 2) onDateRangeChange(dates); }
+  });
+  } // end render()
+
+  // Initial render with all data
+  computeFunnel(0, 0);
+  render();
+
+  // Auto-reload every 5 min
+  setInterval(function() { location.reload(); }, 5 * 60 * 1000);
+})();
+</script>
+</body>
+</html>
