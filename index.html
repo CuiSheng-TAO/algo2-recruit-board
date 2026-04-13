@@ -773,11 +773,12 @@
       var name = TN[tid];
       if (!name) continue;
 
-      if (reached.indexOf(S_I1) >= 0) {
-        i1Cands.push({ name: name, talent_id: tid, application_id: appId });
-      }
-      if (reached.indexOf(S_I2) >= 0) {
+      if (reached.indexOf(S_HR) >= 0) {
+        // HR面+的人不重复显示在一面/二面
+      } else if (reached.indexOf(S_I2) >= 0) {
         i2Cands.push({ name: name, talent_id: tid, application_id: appId });
+      } else if (reached.indexOf(S_I1) >= 0) {
+        i1Cands.push({ name: name, talent_id: tid, application_id: appId });
       }
       if (reached.indexOf(S_HR) >= 0) {
         var st, role, label, nextAction = '';
