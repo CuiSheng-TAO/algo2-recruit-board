@@ -775,8 +775,8 @@
   // HR status mapping by current_stage_idx for active apps
   var HR_STATUS = {};
   HR_STATUS[S_ONBOARD] = ['accept', '已入职', '已入职'];
-  HR_STATUS[S_PENDING] = ['accept', '待入职', '待入职'];
-  HR_STATUS[S_OFFER]   = ['pending', 'Offer沟通', 'Offer沟通中'];
+  HR_STATUS[S_PENDING] = ['top', '待入职', '待入职'];
+  HR_STATUS[S_OFFER]   = ['top', 'Offer沟通', 'Offer沟通中'];
 
   function link(href, text) {
     return '<a class="link" href="' + href + '" target="_blank">' + text + '</a>';
@@ -858,7 +858,7 @@
       hrCands.push({ name: name, talent_id: tid, application_id: appId, status: st, role: role, date: dateStr, label: label, nextAction: nextAction });
     }
 
-    var statusOrder = { accept: 0, pending: 1, reject: 2, decline: 3 };
+    var statusOrder = { top: 0, accept: 1, pending: 2, reject: 3, decline: 4 };
     hrCands.sort(function(a, b) { return (statusOrder[a.status] || 9) - (statusOrder[b.status] || 9); });
 
     D.entry = { resumesSent: total, assessPassed: assessPassed, assessRate: r(assessPassed, total) };
