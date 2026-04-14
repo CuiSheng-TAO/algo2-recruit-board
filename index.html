@@ -1082,20 +1082,19 @@
     var cal = instance.calendarContainer;
     if (!cal) return;
     var monthEl = cal.querySelector('.cur-month');
-    var yearEl = cal.querySelector('.cur-year');
-    if (monthEl && yearEl) {
+    var yearWrap = cal.querySelector('.numInputWrapper');
+    if (monthEl) {
       var m = instance.currentMonth + 1;
       monthEl.textContent = instance.currentYear + '年' + m + '月';
-      yearEl.style.display = 'none';
-      var arrows = cal.querySelectorAll('.numInputWrapper .arrowUp, .numInputWrapper .arrowDown');
-      arrows.forEach(function(a) { a.style.display = 'none'; });
     }
+    if (yearWrap) yearWrap.style.display = 'none';
   }
   picker = flatpickr('#date-range', {
     mode: 'range',
     locale: 'zh',
     dateFormat: 'Y-m-d',
     defaultDate: calendarDates,
+    monthSelectorType: 'static',
     onChange: function(dates) { if (dates.length === 2) onDateRangeChange(dates); },
     onReady: function(selectedDates, dateStr, instance) {
       formatMonthTitle(instance);
