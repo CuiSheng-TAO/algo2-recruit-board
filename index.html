@@ -232,7 +232,45 @@
   }
 
   /* flatpickr overrides */
-  .flatpickr-calendar { font-family: 'Inter', -apple-system, sans-serif !important; font-size: 12px !important; }
+  .flatpickr-calendar { font-family: 'Inter', -apple-system, sans-serif !important; font-size: 13px !important; border-radius: 10px !important; box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important; padding-bottom: 8px; }
+  .flatpickr-months .flatpickr-month { color: var(--ink) !important; fill: var(--ink) !important; }
+  .flatpickr-current-month { font-size: 14px !important; font-weight: 600 !important; padding-top: 6px !important; }
+  .flatpickr-current-month .cur-month, .flatpickr-current-month input.cur-year { font-weight: 600 !important; color: var(--ink) !important; }
+  .flatpickr-weekday { font-weight: 500 !important; color: var(--ink-dim) !important; font-size: 12px !important; }
+  .flatpickr-day { border-radius: 8px !important; font-weight: 400; }
+  .flatpickr-day.today { border-color: var(--accent) !important; color: var(--accent) !important; }
+  .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange,
+  .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus,
+  .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+  }
+  .flatpickr-day.inRange, .flatpickr-day.inRange:hover {
+    background: rgba(24, 119, 242, 0.12) !important;
+    border-color: transparent !important;
+    box-shadow: -5px 0 0 rgba(24, 119, 242, 0.12), 5px 0 0 rgba(24, 119, 242, 0.12) !important;
+    color: var(--ink) !important;
+  }
+  .flatpickr-day.startRange { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+  .flatpickr-day.endRange { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+  .flatpickr-reset-btn {
+    display: block;
+    margin: 8px 12px 4px;
+    padding: 6px 0;
+    width: calc(100% - 24px);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--ink-dim);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .flatpickr-reset-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   /* ─── Main layout ─── */
   .main {
@@ -1036,12 +1074,50 @@
   updateThemeBtn();
 
   // Init flatpickr on date input
+  if (flatpickr.l10ns && flatpickr.l10ns.zh) {
+    flatpickr.l10ns.zh.weekdays.shorthand = ['日','一','二','三','四','五','六'];
+    flatpickr.l10ns.zh.rangeSeparator = ' ~ ';
+  }
+  function formatMonthTitle(instance) {
+    var cal = instance.calendarContainer;
+    if (!cal) return;
+    var monthEl = cal.querySelector('.cur-month');
+    var yearEl = cal.querySelector('.cur-year');
+    if (monthEl && yearEl) {
+      var m = instance.currentMonth + 1;
+      monthEl.textContent = instance.currentYear + '年' + m + '月';
+      yearEl.style.display = 'none';
+      var arrows = cal.querySelectorAll('.numInputWrapper .arrowUp, .numInputWrapper .arrowDown');
+      arrows.forEach(function(a) { a.style.display = 'none'; });
+    }
+  }
   picker = flatpickr('#date-range', {
     mode: 'range',
     locale: 'zh',
     dateFormat: 'Y-m-d',
     defaultDate: calendarDates,
-    onChange: function(dates) { if (dates.length === 2) onDateRangeChange(dates); }
+    onChange: function(dates) { if (dates.length === 2) onDateRangeChange(dates); },
+    onReady: function(selectedDates, dateStr, instance) {
+      formatMonthTitle(instance);
+      // Append reset button
+      var cal = instance.calendarContainer;
+      if (cal && !cal.querySelector('.flatpickr-reset-btn')) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'flatpickr-reset-btn';
+        btn.textContent = '重置';
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          instance.clear();
+          instance.close();
+          switchPeriod('all');
+        });
+        cal.appendChild(btn);
+      }
+    },
+    onMonthChange: function(selectedDates, dateStr, instance) { formatMonthTitle(instance); },
+    onYearChange: function(selectedDates, dateStr, instance) { formatMonthTitle(instance); }
   });
   } // end render()
 
