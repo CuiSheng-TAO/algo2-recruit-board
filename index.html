@@ -315,6 +315,16 @@
     padding: 16px;
   }
 
+  /* ─── Formula card ─── */
+  .formula-card { font-size: 13px; line-height: 1.7; color: var(--ink-soft); }
+  .formula-card .fc-row { display: flex; align-items: baseline; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .formula-card .fc-row:last-of-type { border-bottom: none; }
+  .formula-card .fc-row-label { font-size: 12px; color: var(--ink-dim); }
+  .formula-card .fc-row-val { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
+  .formula-card .fc-proj { margin-top: 10px; font-size: 13px; line-height: 1.7; color: var(--ink-soft); }
+  .formula-card .fc-proj strong { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+  .formula-card .fc-base { margin-top: 8px; font-size: 11px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2px; }
+
   /* ─── Metric hero: 个人主页风格，无边框 ─── */
   .metric-hero {
     background: var(--bg-subtle);
@@ -1046,6 +1056,22 @@
           '<div class="pct-line">' + D.target.current + ' / ' + D.target.goal + ' 在岗 · ' + pct + '%</div>' +
           '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>' +
         '<div class="card" style="font-size:13px;line-height:1.7;color:var(--ink-soft)">目标：<strong style="color:var(--ink)">ML算法实习生</strong> 不少于 <strong style="color:var(--accent)">' + D.target.goal + '</strong> 人，已入职 <strong style="color:var(--ink)">' + D.target.current + '</strong> 人，还需 <strong style="color:var(--red)">' + D.target.gap + '</strong> 人。</div>' +
+        (function() {
+          var hires = D.target.current || 0;
+          if (hires <= 0) return '';
+          var perResume = Math.round(D.entry.resumesSent / hires);
+          var perAssess = Math.round(D.entry.assessPassed / hires);
+          var gapResume = perResume * D.target.gap;
+          var gapAssess = perAssess * D.target.gap;
+          return '<div class="section-label" style="margin-top:4px">招聘公式 <span class="tail">formula</span></div>' +
+                 '<div class="card formula-card">' +
+                   '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">每入职 <strong style="color:var(--ink)">1</strong> 人平均需要</div>' +
+                   '<div class="fc-row"><span class="fc-row-label">简历投递</span><span class="fc-row-val">' + perResume + ' 份</span></div>' +
+                   '<div class="fc-row"><span class="fc-row-label">评估通过</span><span class="fc-row-val">' + perAssess + ' 人</span></div>' +
+                   '<div class="fc-proj">还差 <strong>' + D.target.gap + '</strong> 人 → 预计还需 <strong>' + gapResume.toLocaleString() + '</strong> 份简历、<strong>' + gapAssess.toLocaleString() + '</strong> 人评估通过。</div>' +
+                   '<div class="fc-base">base · ' + D.entry.resumesSent + ' → ' + D.entry.assessPassed + ' → ' + hires + '</div>' +
+                 '</div>';
+        })() +
       '</aside>' +
       '<section class="fade-in" style="animation-delay:0.1s;display:flex;flex-direction:column;gap:0">' +
         '<div class="section-label">招聘漏斗 <span class="tail">funnel · ' + currentLabel + '</span></div>' +
