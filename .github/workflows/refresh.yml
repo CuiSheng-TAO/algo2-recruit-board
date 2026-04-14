@@ -40,7 +40,17 @@ jobs:
           git add data.js talent_info.json
           if git diff --cached --quiet; then
             echo "no changes"
-          else
-            git commit -m "data: auto refresh $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push
+            exit 0
           fi
+          git commit -m "data: auto refresh $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main || true
+            if git push; then
+              echo "push succeeded on attempt $i"
+              exit 0
+            fi
+            echo "push failed on attempt $i, retrying..."
+            sleep 3
+          done
+          echo "push failed after 5 attempts"
+          exit 1

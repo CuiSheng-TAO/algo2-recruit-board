@@ -751,6 +751,7 @@
 (function() {
   var D = DASHBOARD_DATA;
   var L = D.links;
+  L.hireReport = 'https://deepwisdom.feishu.cn/hire/reports/custom/preview?lang=zh-CN&open_in_browser=true&key=7628440271964998588';
   var TN = D.talentNames;
   var apps = D.apps; // [id, talent_id, create_time, active_status, term_type, current_stage_idx, [reached_stages], hr_enter_time]
   var currentLabel = '所有时间';
@@ -807,38 +808,44 @@
     var i2Total = stageReached[S_I2] || 0;
     var i2Passed = stageReached[S_HR] || 0;
 
-    // Build candidate lists
-    var i1Cands = [], i2Cands = [], hrCands = [];
+    // Build i1/i2 candidate lists from date-filtered apps
+    var i1Cands = [], i2Cands = [];
     for (var i = 0; i < filtered.length; i++) {
       var a = filtered[i];
-      var appId = a[0], tid = a[1], reached = a[6], activeStatus = a[3], termType = a[4], curIdx = a[5], hrEnter = a[7];
+      var appId = a[0], tid = a[1], reached = a[6];
       var name = TN[tid];
       if (!name) continue;
-
-      if (reached.indexOf(S_HR) >= 0) {
-        // HR面+的人不重复显示在一面/二面
-      } else if (reached.indexOf(S_I2) >= 0) {
+      if (reached.indexOf(S_HR) >= 0) continue;
+      if (reached.indexOf(S_I2) >= 0) {
         i2Cands.push({ name: name, talent_id: tid, application_id: appId });
       } else if (reached.indexOf(S_I1) >= 0) {
         i1Cands.push({ name: name, talent_id: tid, application_id: appId });
       }
-      if (reached.indexOf(S_HR) >= 0) {
-        var st, role, label, nextAction = '';
-        if (activeStatus === 1 && HR_STATUS[curIdx]) {
-          st = HR_STATUS[curIdx][0]; role = HR_STATUS[curIdx][1]; label = HR_STATUS[curIdx][2];
-          if (curIdx === S_OFFER) nextAction = '确认 Offer 接受意向';
-        } else if (activeStatus === 1) {
-          st = 'pending'; role = 'HR面进行中'; label = '进行中';
-        } else if (termType === 22) {
-          st = 'decline'; role = '候选人放弃'; label = '候选人放弃';
-        } else if (termType === 1) {
-          st = 'reject'; role = 'HR面淘汰'; label = '已淘汰';
-        } else {
-          st = 'decline'; role = '已终止'; label = '已终止';
-        }
-        var dateStr = hrEnter ? new Date(hrEnter).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '';
-        hrCands.push({ name: name, talent_id: tid, application_id: appId, status: st, role: role, date: dateStr, label: label, nextAction: nextAction });
+    }
+
+    // HR exit: always show ALL candidates currently in HR面+, regardless of date filter
+    var hrCands = [];
+    for (var i = 0; i < apps.length; i++) {
+      var a = apps[i];
+      var appId = a[0], tid = a[1], reached = a[6], activeStatus = a[3], termType = a[4], curIdx = a[5], hrEnter = a[7];
+      var name = TN[tid];
+      if (!name) continue;
+      if (reached.indexOf(S_HR) < 0) continue;
+      var st, role, label, nextAction = '';
+      if (activeStatus === 1 && HR_STATUS[curIdx]) {
+        st = HR_STATUS[curIdx][0]; role = HR_STATUS[curIdx][1]; label = HR_STATUS[curIdx][2];
+        if (curIdx === S_OFFER) nextAction = '确认 Offer 接受意向';
+      } else if (activeStatus === 1) {
+        st = 'pending'; role = 'HR面进行中'; label = '进行中';
+      } else if (termType === 22) {
+        st = 'decline'; role = '候选人放弃'; label = '候选人放弃';
+      } else if (termType === 1) {
+        st = 'reject'; role = 'HR面淘汰'; label = '已淘汰';
+      } else {
+        st = 'decline'; role = '已终止'; label = '已终止';
       }
+      var dateStr = hrEnter ? new Date(hrEnter).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) : '';
+      hrCands.push({ name: name, talent_id: tid, application_id: appId, status: st, role: role, date: dateStr, label: label, nextAction: nextAction });
     }
 
     var statusOrder = { accept: 0, pending: 1, reject: 2, decline: 3 };
@@ -857,6 +864,7 @@
       candidates: i2Cands, candidates12m: []
     };
     D.hrInterview = { total: hrCands.length, candidates: hrCands };
+    D.offerSignoff = stageReached[S_OFFER] || 0;
     D.offerAccepted = stageReached[S_PENDING] || 0;
   }
 
@@ -931,7 +939,8 @@
     { name: '评估通过 → 安排一面', entered: D.writtenTest.passed, passed: i1.current.total, rate: r(i1.current.total, D.writtenTest.passed), link: L.hireReport, unit: '人', anomaly: false },
     { name: '安排一面 → 通过一面', entered: i1.current.total, passed: i1.current.passed, rate: i1.current.rate, link: L.interview1_3m, unit: '人', anomaly: i1Anomaly },
     { name: '安排二面 → 通过二面', entered: i2.current.total, passed: i2.current.passed, rate: i2.current.rate, link: L.interview2_detail, unit: '人', anomaly: i2Anomaly },
-    { name: '通过二面 → 接受offer', entered: i2.current.passed, passed: D.offerAccepted, rate: r(D.offerAccepted, i2.current.passed), link: L.hireReport, unit: '人', anomaly: false }
+    { name: '通过二面 → offer沟通', entered: i2.current.passed, passed: D.offerSignoff, rate: r(D.offerSignoff, i2.current.passed), link: L.hireReport, unit: '人', anomaly: false },
+    { name: 'offer沟通 → 接受offer', entered: D.offerSignoff, passed: D.offerAccepted, rate: r(D.offerAccepted, D.offerSignoff), link: L.hireReport, unit: '人', anomaly: false }
   ];
 
   var funnelRowsHTML = stages.map(function(s) {

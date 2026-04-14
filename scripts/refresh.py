@@ -176,14 +176,17 @@ def build_data_js(all_details, talent_info):
     max_date = datetime.fromtimestamp(max(times) / 1000).strftime("%Y-%m-%d") if times else ""
     now = datetime.now()
     job_url = f"https://deepwisdom.feishu.cn/hire/job/{JOB_ID}"
+    funnel_report_url = "https://deepwisdom.feishu.cn/hire/reports/custom/preview?lang=zh-CN&open_in_browser=true&key=7628440271964998588"
+    links = {k: job_url for k in ["wiki", "writtenTestPipeline",
+                                  "interview1_3m", "interview1_12m",
+                                  "interview2_detail", "interview2_12m"]}
+    links["hireReport"] = funnel_report_url
     output = {
         "dataPeriod": f"{min_date} \u2013 {max_date}",
         "updateTime": now.strftime("%Y-%m-%d %H:%M"),
         "dateRange": [min_date, max_date],
         "target": {"current": 3, "goal": 5, "gap": 2},
-        "links": {k: job_url for k in ["hireReport", "wiki", "writtenTestPipeline",
-                                       "interview1_3m", "interview1_12m",
-                                       "interview2_detail", "interview2_12m"]},
+        "links": links,
         "talentNames": talent_names,
         "apps": minimal_apps,
     }
