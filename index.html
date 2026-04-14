@@ -324,6 +324,7 @@
   .formula-card .fc-proj { margin-top: 10px; font-size: 13px; line-height: 1.7; color: var(--ink-soft); }
   .formula-card .fc-proj strong { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
   .formula-card .fc-base { margin-top: 8px; font-size: 11px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2px; }
+  .formula-card .fc-row-sub { font-size: 11px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; margin-left: 8px; font-weight: 500; }
 
   /* ─── Metric hero: 个人主页风格，无边框 ─── */
   .metric-hero {
@@ -1060,17 +1061,45 @@
         (function() {
           var hires = D.target.current || 0;
           if (hires <= 0) return '';
-          var perResume = Math.round(D.entry.resumesSent / hires);
-          var perAssess = Math.round(D.entry.assessPassed / hires);
-          var gapResume = perResume * D.target.gap;
-          var gapAssess = perAssess * D.target.gap;
+          var gap = D.target.gap;
+          var rows = [
+            ['简历投递', D.entry.resumesSent, '份'],
+            ['推送评估', D.entry.assessPassed, '人'],
+            ['评估通过', D.writtenTest.passed, '人'],
+            ['一面安排', D.interview1.current.total, '人'],
+            ['一面通过', D.interview1.current.passed, '人'],
+            ['二面通过', D.interview2.current.passed, '人'],
+            ['Offer沟通', D.offerSignoff, '人'],
+            ['接受Offer', D.offerAccepted, '人']
+          ];
+          var rowsHTML = '';
+          for (var i = 0; i < rows.length; i++) {
+            var label = rows[i][0], value = rows[i][1], unit = rows[i][2];
+            var perHire = Math.round(value / hires);
+            var proj = perHire * gap;
+            rowsHTML += '<div class="fc-row">' +
+                          '<span class="fc-row-label">' + label + '</span>' +
+                          '<span><span class="fc-row-val">' + perHire + ' ' + unit + '</span>' +
+                            '<span class="fc-row-sub">× ' + gap + ' = ' + proj.toLocaleString() + '</span>' +
+                          '</span>' +
+                        '</div>';
+          }
+          var baseChain = [
+            D.entry.resumesSent,
+            D.entry.assessPassed,
+            D.writtenTest.passed,
+            D.interview1.current.total,
+            D.interview1.current.passed,
+            D.interview2.current.passed,
+            D.offerSignoff,
+            D.offerAccepted,
+            hires
+          ].join(' → ');
           return '<div class="section-label" style="margin-top:4px">招聘公式 <span class="tail">formula</span></div>' +
                  '<div class="card formula-card">' +
-                   '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">每入职 <strong style="color:var(--ink)">1</strong> 人平均需要</div>' +
-                   '<div class="fc-row"><span class="fc-row-label">简历投递</span><span class="fc-row-val">' + perResume + ' 份</span></div>' +
-                   '<div class="fc-row"><span class="fc-row-label">评估通过</span><span class="fc-row-val">' + perAssess + ' 人</span></div>' +
-                   '<div class="fc-proj">还差 <strong>' + D.target.gap + '</strong> 人 → 预计还需 <strong>' + gapResume.toLocaleString() + '</strong> 份简历、<strong>' + gapAssess.toLocaleString() + '</strong> 人评估通过。</div>' +
-                   '<div class="fc-base">base · ' + D.entry.resumesSent + ' → ' + D.entry.assessPassed + ' → ' + hires + '</div>' +
+                   '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">每入职 <strong style="color:var(--ink)">1</strong> 人平均需要（还差 <strong style="color:var(--red)">' + gap + '</strong> 人）</div>' +
+                   rowsHTML +
+                   '<div class="fc-base">base · ' + baseChain + '</div>' +
                  '</div>';
         })() +
       '</aside>' +
