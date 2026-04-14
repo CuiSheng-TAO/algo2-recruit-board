@@ -819,6 +819,7 @@
       candidates: i2Cands, candidates12m: []
     };
     D.hrInterview = { total: hrCands.length, candidates: hrCands };
+    D.offerAccepted = stageReached[S_PENDING] || 0;
   }
 
   /* ── Period date range helpers ── */
@@ -887,10 +888,12 @@
   var pct = Math.round(D.target.current / D.target.goal * 100);
 
   var stages = [
-    { name: '简历筛选 · 评估', entered: D.entry.resumesSent, passed: D.entry.assessPassed, rate: D.entry.assessRate, link: L.hireReport, unit: '份', anomaly: false },
-    { name: '初面邀约', entered: D.writtenTest.collected, passed: D.writtenTest.passed, rate: D.writtenTest.collected > 0 ? Math.round(D.writtenTest.passed / D.writtenTest.collected * 100) : 0, link: L.writtenTestPipeline || L.wiki, unit: '人', anomaly: false },
-    { name: '专业一面', entered: i1.current.total, passed: i1.current.passed, rate: i1.current.rate, link: L.interview1_3m, unit: '人', anomaly: i1Anomaly },
-    { name: '专业二面', entered: i2.current.total, passed: i2.current.passed, rate: i2.current.rate, link: L.interview2_detail, unit: '人', anomaly: i2Anomaly }
+    { name: '简历入库 → 推送评估', entered: D.entry.resumesSent, passed: D.entry.assessPassed, rate: D.entry.assessRate, link: L.hireReport, unit: '人', anomaly: false },
+    { name: '推送评估 → 评估通过', entered: D.entry.assessPassed, passed: D.writtenTest.passed, rate: r(D.writtenTest.passed, D.entry.assessPassed), link: L.hireReport, unit: '人', anomaly: false },
+    { name: '评估通过 → 安排一面', entered: D.writtenTest.passed, passed: i1.current.total, rate: r(i1.current.total, D.writtenTest.passed), link: L.hireReport, unit: '人', anomaly: false },
+    { name: '安排一面 → 通过一面', entered: i1.current.total, passed: i1.current.passed, rate: i1.current.rate, link: L.interview1_3m, unit: '人', anomaly: i1Anomaly },
+    { name: '通过一面 → 安排二面', entered: i1.current.passed, passed: i2.current.total, rate: r(i2.current.total, i1.current.passed), link: L.interview2_detail, unit: '人', anomaly: false },
+    { name: '通过二面 → 接受offer', entered: i2.current.passed, passed: D.offerAccepted, rate: r(D.offerAccepted, i2.current.passed), link: L.hireReport, unit: '人', anomaly: false }
   ];
 
   var funnelRowsHTML = stages.map(function(s) {
