@@ -143,11 +143,15 @@ def build_data_js(all_details, talent_info):
     for app in all_details:
         reached = set()
         hr_enter = None
+        stage_enter = [0] * 9  # stage index → enter_time (0 if never entered)
         for st in app.get("stage_time_list", []):
             sid = st.get("stage_id")
             idx = STAGE_INDEX.get(sid)
             if idx is not None:
                 reached.add(idx)
+                t = st.get("enter_time")
+                if t:
+                    stage_enter[idx] = int(t)
             if sid == "7484987042608285962":
                 t = st.get("enter_time")
                 if t:
@@ -158,6 +162,9 @@ def build_data_js(all_details, talent_info):
             if idx is not None:
                 reached.add(idx)
         current_idx = STAGE_INDEX.get(current_sid, -1)
+        # Stage 0 (简历初筛) uses create_time if not otherwise recorded
+        if stage_enter[0] == 0:
+            stage_enter[0] = int(app.get("create_time", 0))
         record = [
             app.get("id", ""),
             app.get("talent_id", ""),
@@ -167,6 +174,7 @@ def build_data_js(all_details, talent_info):
             current_idx,
             sorted(reached),
             hr_enter or 0,
+            stage_enter,
         ]
         minimal_apps.append(record)
 

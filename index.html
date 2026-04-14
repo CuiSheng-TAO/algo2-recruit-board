@@ -316,15 +316,22 @@
   }
 
   /* ─── Formula card ─── */
-  .formula-card { font-size: 13px; line-height: 1.7; color: var(--ink-soft); }
-  .formula-card .fc-row { display: flex; align-items: baseline; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  .formula-card { font-size: 13px; line-height: 1.6; color: var(--ink-soft); }
+  .formula-card .fc-summary { padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .formula-card .fc-summary-main { font-size: 13px; color: var(--ink-soft); }
+  .formula-card .fc-summary-main strong { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+  .formula-card .fc-summary-main strong.accent { color: var(--accent); }
+  .formula-card .fc-summary-main strong.red { color: var(--red); }
+  .formula-card .fc-row { padding: 7px 0; border-bottom: 1px dashed var(--border); }
   .formula-card .fc-row:last-of-type { border-bottom: none; }
+  .formula-card .fc-row-main { display: flex; align-items: baseline; justify-content: space-between; }
   .formula-card .fc-row-label { font-size: 12px; color: var(--ink-dim); }
-  .formula-card .fc-row-val { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
-  .formula-card .fc-proj { margin-top: 10px; font-size: 13px; line-height: 1.7; color: var(--ink-soft); }
-  .formula-card .fc-proj strong { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
-  .formula-card .fc-base { margin-top: 8px; font-size: 11px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2px; }
-  .formula-card .fc-row-sub { font-size: 11px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; margin-left: 8px; font-weight: 500; }
+  .formula-card .fc-row-val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
+  .formula-card .fc-row-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; font-size: 10px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; }
+  .formula-card .fc-row-meta .meta-warn { color: var(--red); }
+  .formula-card .fc-reset { cursor: pointer; user-select: none; padding: 1px 6px; border-radius: 3px; color: var(--ink-dim); background: transparent; border: 1px solid var(--border); font-size: 10px; transition: all 0.15s; }
+  .formula-card .fc-reset:hover { color: var(--accent); border-color: var(--accent); }
+  .formula-card .fc-note { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 10px; color: var(--ink-faint); line-height: 1.5; }
 
   /* ─── Metric hero: 个人主页风格，无边框 ─── */
   .metric-hero {
@@ -880,6 +887,104 @@
     D.offerAccepted = stageReached[S_PENDING] || 0;
   }
 
+  /* ── Funnel conversion rates by cohort (independent of UI date filter) ── */
+  // Transitions: i = 0..7 → P(entered stage i+1 | entered stage i AND closed)
+  var TRANSITION_LABELS = [
+    ['简历投递', '推送评估'],
+    ['推送评估', '评估通过'],
+    ['评估通过', '一面安排'],
+    ['一面安排', '一面通过'],
+    ['一面通过', '二面通过'],
+    ['二面通过', 'Offer沟通'],
+    ['Offer沟通', '接受Offer'],
+    ['接受Offer', '入职'],
+  ];
+  var ANCHOR_STORAGE_KEY = 'algo2-funnel-anchors-v1';
+  var NINETY_DAYS_MS = 90 * 24 * 3600 * 1000;
+  var MIN_SAMPLES = 10;
+
+  function loadAnchors() {
+    var defaultAnchor = Date.now() - NINETY_DAYS_MS;
+    var stored = {};
+    try {
+      var raw = localStorage.getItem(ANCHOR_STORAGE_KEY);
+      if (raw) stored = JSON.parse(raw) || {};
+    } catch (e) {}
+    var anchors = [];
+    for (var i = 0; i < 8; i++) {
+      anchors.push(typeof stored[i] === 'number' ? stored[i] : defaultAnchor);
+    }
+    return anchors;
+  }
+
+  function saveAnchor(i, ts) {
+    var stored = {};
+    try {
+      var raw = localStorage.getItem(ANCHOR_STORAGE_KEY);
+      if (raw) stored = JSON.parse(raw) || {};
+    } catch (e) {}
+    if (ts === null) delete stored[i];
+    else stored[i] = ts;
+    localStorage.setItem(ANCHOR_STORAGE_KEY, JSON.stringify(stored));
+  }
+
+  function getStageEnter(a, stageIdx) {
+    // a[8] = stage_enter_times[9]; a[6] = reached array; a[2] = create_time
+    if (a[8] && a[8][stageIdx]) return a[8][stageIdx];
+    // Legacy fallback: if app reached stage but no timestamp, use create_time
+    if (a[6].indexOf(stageIdx) >= 0) return a[2];
+    return 0;
+  }
+
+  // Compute P_i for one transition given a cutoff (0 = full history)
+  function computeOneTransition(i, cutoff) {
+    var passed = 0, closed = 0;
+    for (var k = 0; k < apps.length; k++) {
+      var a = apps[k];
+      var reached = a[6], active = a[3];
+      if (reached.indexOf(i) < 0) continue; // never entered stage i
+      var enterAtI = getStageEnter(a, i);
+      if (!enterAtI) continue;
+      if (cutoff > 0 && enterAtI < cutoff) continue; // outside cohort
+      var maxReached = reached[reached.length - 1];
+      if (maxReached >= i + 1) {
+        passed++; closed++;
+      } else if (active !== 1) {
+        // terminated/withdrawn while at stage i
+        closed++;
+      }
+      // else: still pending at stage i → exclude
+    }
+    return { passed: passed, closed: closed };
+  }
+
+  function computeStageConversions(anchors) {
+    var out = { P: [], samples: [], closedCounts: [], usedFallback: [], anchors: anchors.slice() };
+    for (var i = 0; i < 8; i++) {
+      var r1 = computeOneTransition(i, anchors[i]);
+      var fellBack = false;
+      var useR = r1;
+      if (r1.closed < MIN_SAMPLES) {
+        // fallback to full history
+        var r2 = computeOneTransition(i, 0);
+        useR = r2;
+        fellBack = true;
+      }
+      var p = useR.closed > 0 ? useR.passed / useR.closed : 0;
+      out.P.push(p);
+      out.samples.push(r1.closed); // samples in current cohort (not fallback)
+      out.closedCounts.push(useR.closed); // what we actually computed with
+      out.usedFallback.push(fellBack);
+    }
+    return out;
+  }
+
+  function resetAnchor(i) {
+    saveAnchor(i, Date.now()); // anchor = now → cohort starts empty
+    render();
+  }
+  window.__resetAnchor = resetAnchor;
+
   /* ── Period date range helpers ── */
   function periodRange(key) {
     var now = new Date();
@@ -1059,47 +1164,55 @@
           '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>' +
         '<div class="card" style="font-size:13px;line-height:1.7;color:var(--ink-soft)">目标：<strong style="color:var(--ink)">ML算法实习生</strong> 不少于 <strong style="color:var(--accent)">' + D.target.goal + '</strong> 人，已入职 <strong style="color:var(--ink)">' + D.target.current + '</strong> 人，还需 <strong style="color:var(--red)">' + D.target.gap + '</strong> 人。</div>' +
         (function() {
-          var hires = D.target.current || 0;
-          if (hires <= 0) return '';
           var gap = D.target.gap;
-          var rows = [
-            ['简历投递', D.entry.resumesSent, '份'],
-            ['推送评估', D.entry.assessPassed, '人'],
-            ['评估通过', D.writtenTest.passed, '人'],
-            ['一面安排', D.interview1.current.total, '人'],
-            ['一面通过', D.interview1.current.passed, '人'],
-            ['二面通过', D.interview2.current.passed, '人'],
-            ['Offer沟通', D.offerSignoff, '人'],
-            ['接受Offer', D.offerAccepted, '人']
-          ];
+          if (gap <= 0) return '';
+          var anchors = loadAnchors();
+          var conv = computeStageConversions(anchors);
+          var totalP = 1;
+          for (var i = 0; i < conv.P.length; i++) totalP *= conv.P[i];
+          var anyZero = conv.P.some(function(p) { return p === 0; });
+          var needResumes = (!anyZero && totalP > 0) ? Math.ceil(gap / totalP) : null;
+          var anyFallback = conv.usedFallback.some(function(x) { return x; });
+
           var rowsHTML = '';
-          for (var i = 0; i < rows.length; i++) {
-            var label = rows[i][0], value = rows[i][1], unit = rows[i][2];
-            var perHire = Math.round(value / hires);
-            var proj = perHire * gap;
+          for (var i = 0; i < 8; i++) {
+            var lab = TRANSITION_LABELS[i];
+            var pct = (conv.P[i] * 100).toFixed(1);
+            var anchorDate = new Date(anchors[i]);
+            var anchorStr = (anchorDate.getMonth() + 1) + '/' + anchorDate.getDate();
+            var metaLeft = conv.usedFallback[i]
+              ? '<span class="meta-warn">样本 ' + conv.samples[i] + '/' + MIN_SAMPLES + ' · 用历史 ' + conv.closedCounts[i] + '</span>'
+              : '样本 ' + conv.closedCounts[i] + ' · 自 ' + anchorStr;
             rowsHTML += '<div class="fc-row">' +
-                          '<span class="fc-row-label">' + label + '</span>' +
-                          '<span><span class="fc-row-val">' + perHire + ' ' + unit + '</span>' +
-                            '<span class="fc-row-sub">× ' + gap + ' = ' + proj.toLocaleString() + '</span>' +
-                          '</span>' +
+                          '<div class="fc-row-main">' +
+                            '<span class="fc-row-label">' + lab[0] + ' → ' + lab[1] + '</span>' +
+                            '<span class="fc-row-val">' + pct + '%</span>' +
+                          '</div>' +
+                          '<div class="fc-row-meta">' +
+                            '<span>' + metaLeft + '</span>' +
+                            '<span class="fc-reset" onclick="__resetAnchor(' + i + ')" title="从今天起重新采样">🔄 重置</span>' +
+                          '</div>' +
                         '</div>';
           }
-          var baseChain = [
-            D.entry.resumesSent,
-            D.entry.assessPassed,
-            D.writtenTest.passed,
-            D.interview1.current.total,
-            D.interview1.current.passed,
-            D.interview2.current.passed,
-            D.offerSignoff,
-            D.offerAccepted,
-            hires
-          ].join(' → ');
-          return '<div class="section-label" style="margin-top:4px">招聘公式 <span class="tail">formula</span></div>' +
+
+          var summaryHTML;
+          if (needResumes !== null) {
+            var totalPct = (totalP * 100).toFixed(2);
+            summaryHTML = '补足 <strong class="red">' + gap + '</strong> 人缺口，按当前转化率预计需再投入 <strong class="accent">' + needResumes.toLocaleString() + '</strong> 份简历' +
+                          '<span style="display:block;font-size:11px;color:var(--ink-faint);margin-top:4px;font-family:\'JetBrains Mono\',monospace">综合通过率 ' + totalPct + '%</span>';
+          } else {
+            summaryHTML = '<span style="color:var(--ink-dim)">部分阶段无历史样本，暂无法估算总量</span>';
+          }
+
+          var note = '每档转化率基于"进入该阶段的时间 ≥ 锚点"的 cohort，默认最近 90 天。' +
+                     '样本不足 ' + MIN_SAMPLES + ' 时自动回退历史基准。' +
+                     (anyFallback ? '<br><span style="color:var(--red)">⚠ 含回退阶段，结果仅供参考</span>' : '');
+
+          return '<div class="section-label" style="margin-top:4px">招聘公式 <span class="tail">stage conversion · cohort</span></div>' +
                  '<div class="card formula-card">' +
-                   '<div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px">每入职 <strong style="color:var(--ink)">1</strong> 人平均需要（还差 <strong style="color:var(--red)">' + gap + '</strong> 人）</div>' +
+                   '<div class="fc-summary"><div class="fc-summary-main">' + summaryHTML + '</div></div>' +
                    rowsHTML +
-                   '<div class="fc-base">base · ' + baseChain + '</div>' +
+                   '<div class="fc-note">' + note + '</div>' +
                  '</div>';
         })() +
       '</aside>' +
