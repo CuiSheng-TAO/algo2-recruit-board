@@ -161,6 +161,10 @@
     0%, 100% { opacity: 1; }
     50%       { opacity: 0.4; }
   }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
 
   .theme-toggle {
     background: none;
@@ -980,6 +984,7 @@
           '<input id="date-range" class="date-input" placeholder="选择日期范围" readonly>' +
         '</div>' +
         '<span class="live-badge"><span class="live-dot"></span>更新 ' + D.updateTime + '</span>' +
+        '<button id="refresh-btn" class="theme-toggle" title="刷新数据" onclick="manualRefresh()">↻</button>' +
         '<button id="theme-toggle" class="theme-toggle"></button>' +
       '</div>' +
     '</header>' +
@@ -1005,6 +1010,21 @@
         actionItemsHTML +
       '</aside>' +
     '</main></div>';
+
+  // Manual refresh — cache-bust reload data.js then re-render
+  window.manualRefresh = function() {
+    var rb = document.getElementById('refresh-btn');
+    if (rb) { rb.style.animation = 'spin 0.8s linear infinite'; rb.disabled = true; }
+    var s = document.createElement('script');
+    s.src = 'data.js?t=' + Date.now();
+    s.onload = function() {
+      D = DASHBOARD_DATA; L = D.links; TN = D.talentNames; apps = D.apps;
+      render();
+      if (rb) { rb.style.animation = ''; rb.disabled = false; }
+    };
+    s.onerror = function() { if (rb) { rb.style.animation = ''; rb.disabled = false; } alert('刷新失败'); };
+    document.body.appendChild(s);
+  };
 
   // Theme toggle
   var btn = document.getElementById('theme-toggle');
