@@ -984,7 +984,7 @@
           '<input id="date-range" class="date-input" placeholder="选择日期范围" readonly>' +
         '</div>' +
         '<span class="live-badge"><span class="live-dot"></span>更新 ' + D.updateTime + '</span>' +
-        '<button id="refresh-btn" class="theme-toggle" title="刷新数据" onclick="manualRefresh()">↻</button>' +
+        '<button id="refresh-btn" class="theme-toggle" title="立即更新数据（跳转到 GitHub Actions 手动触发）" onclick="manualRefresh()">↻ 立即更新</button>' +
         '<button id="theme-toggle" class="theme-toggle"></button>' +
       '</div>' +
     '</header>' +
@@ -1011,19 +1011,11 @@
       '</aside>' +
     '</main></div>';
 
-  // Manual refresh — cache-bust reload data.js then re-render
+  // Manual refresh — open GH Actions workflow page for manual trigger
   window.manualRefresh = function() {
-    var rb = document.getElementById('refresh-btn');
-    if (rb) { rb.style.animation = 'spin 0.8s linear infinite'; rb.disabled = true; }
-    var s = document.createElement('script');
-    s.src = 'data.js?t=' + Date.now();
-    s.onload = function() {
-      D = DASHBOARD_DATA; L = D.links; TN = D.talentNames; apps = D.apps;
-      render();
-      if (rb) { rb.style.animation = ''; rb.disabled = false; }
-    };
-    s.onerror = function() { if (rb) { rb.style.animation = ''; rb.disabled = false; } alert('刷新失败'); };
-    document.body.appendChild(s);
+    if (confirm('数据每 5 分钟自动从飞书同步。\n\n点击「确定」跳转到 GitHub Actions 页面手动触发立即更新（点 Run workflow 按钮，2-5 分钟后回来硬刷新页面即可看到新数据）。')) {
+      window.open('https://github.com/CuiSheng-TAO/algo2-recruit-board/actions/workflows/refresh.yml', '_blank');
+    }
   };
 
   // Theme toggle
