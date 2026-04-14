@@ -1117,13 +1117,10 @@
   function formatMonthTitle(instance) {
     var cal = instance.calendarContainer;
     if (!cal) return;
-    var monthEl = cal.querySelector('.cur-month');
-    var yearWrap = cal.querySelector('.numInputWrapper');
-    if (monthEl) {
-      var m = instance.currentMonth + 1;
-      monthEl.textContent = instance.currentYear + '年' + m + '月';
-    }
-    if (yearWrap) yearWrap.style.display = 'none';
+    var titleEl = cal.querySelector('.flatpickr-current-month');
+    if (!titleEl) return;
+    var m = instance.currentMonth + 1;
+    titleEl.innerHTML = '<span class="cur-month">' + instance.currentYear + '年' + m + '月</span>';
   }
   picker = flatpickr('#date-range', {
     mode: 'range',
@@ -1152,7 +1149,11 @@
       }
     },
     onMonthChange: function(selectedDates, dateStr, instance) { formatMonthTitle(instance); },
-    onYearChange: function(selectedDates, dateStr, instance) { formatMonthTitle(instance); }
+    onYearChange: function(selectedDates, dateStr, instance) { formatMonthTitle(instance); },
+    onOpen: function(selectedDates, dateStr, instance) {
+      instance.jumpToDate(new Date());
+      formatMonthTitle(instance);
+    }
   });
   } // end render()
 
