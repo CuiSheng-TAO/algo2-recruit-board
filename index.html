@@ -974,7 +974,7 @@
       '</div>' +
       '<div class="header-right">' +
         '<div class="time-filters">' +
-          ['all','quarter','month','week'].map(function(k) {
+          ['all'].map(function(k) {
             return '<button class="time-btn' + (currentLabel === periodLabels[k] ? ' active' : '') + '" data-period="' + k + '" onclick="switchPeriod(\'' + k + '\')">' + periodLabels[k] + '</button>';
           }).join('') +
           '<input id="date-range" class="date-input" placeholder="选择日期范围" readonly>' +
