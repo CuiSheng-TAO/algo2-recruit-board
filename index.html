@@ -818,13 +818,14 @@
     var i2Total = stageReached[S_I2] || 0;
     var i2Passed = stageReached[S_HR] || 0;
 
-    // Build i1/i2 candidate lists from date-filtered apps
+    // Build i1/i2 candidate lists from date-filtered apps (only active, not yet at HR)
     var i1Cands = [], i2Cands = [];
     for (var i = 0; i < filtered.length; i++) {
       var a = filtered[i];
-      var appId = a[0], tid = a[1], reached = a[6];
+      var appId = a[0], tid = a[1], activeStatus = a[3], reached = a[6];
       var name = TN[tid];
       if (!name) continue;
+      if (activeStatus !== 1) continue;
       if (reached.indexOf(S_HR) >= 0) continue;
       if (reached.indexOf(S_I2) >= 0) {
         i2Cands.push({ name: name, talent_id: tid, application_id: appId });
