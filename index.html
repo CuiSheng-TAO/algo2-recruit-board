@@ -858,7 +858,7 @@
       hrCands.push({ name: name, talent_id: tid, application_id: appId, status: st, role: role, date: dateStr, label: label, nextAction: nextAction });
     }
 
-    var statusOrder = { top: 0, accept: 1, pending: 2, reject: 3, decline: 4 };
+    var statusOrder = { top: 1, accept: 2, pending: 3, reject: 4, decline: 5 };
     hrCands.sort(function(a, b) { return (statusOrder[a.status] || 9) - (statusOrder[b.status] || 9); });
 
     D.entry = { resumesSent: total, assessPassed: assessPassed, assessRate: r(assessPassed, total) };
