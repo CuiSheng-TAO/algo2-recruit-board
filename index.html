@@ -892,7 +892,7 @@
     { name: '推送评估 → 评估通过', entered: D.entry.assessPassed, passed: D.writtenTest.passed, rate: r(D.writtenTest.passed, D.entry.assessPassed), link: L.hireReport, unit: '人', anomaly: false },
     { name: '评估通过 → 安排一面', entered: D.writtenTest.passed, passed: i1.current.total, rate: r(i1.current.total, D.writtenTest.passed), link: L.hireReport, unit: '人', anomaly: false },
     { name: '安排一面 → 通过一面', entered: i1.current.total, passed: i1.current.passed, rate: i1.current.rate, link: L.interview1_3m, unit: '人', anomaly: i1Anomaly },
-    { name: '通过一面 → 安排二面', entered: i1.current.passed, passed: i2.current.total, rate: r(i2.current.total, i1.current.passed), link: L.interview2_detail, unit: '人', anomaly: false },
+    { name: '安排二面 → 通过二面', entered: i2.current.total, passed: i2.current.passed, rate: i2.current.rate, link: L.interview2_detail, unit: '人', anomaly: i2Anomaly },
     { name: '通过二面 → 接受offer', entered: i2.current.passed, passed: D.offerAccepted, rate: r(D.offerAccepted, i2.current.passed), link: L.hireReport, unit: '人', anomaly: false }
   ];
 
